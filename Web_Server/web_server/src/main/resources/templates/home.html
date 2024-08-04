@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcomAnalyzer - Công cụ phân tích cho nhà bán</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/custom-style.css" th:href="@{/css/custom-style.css}">
+    <link rel="icon" type="image/x-icon" href="../static/images/favicon.png" th:href="@{/images/favicon.png}">
+</head>
+
+<body>
+<div class="container-fluid">
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-2">
+            <!-- Left Side-Bar Menu -->
+            <div class="left-sidebar">
+                <ul>
+                    <li>
+                        <a href="#" th:href="@{/}">
+                            <img src="../static/images/logo.png" th:src="@{/images/logo.png}" alt="logo">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           th:href="@{/}"
+                           th:classappend="${menuItem == 1} ? 'active' : ''">Phân tích theo giai đoạn
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           th:href="@{/best-selling}"
+                           th:classappend="${menuItem == 2} ? 'active': ''">Sản phẩm bán chạy
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           th:href="@{/}"
+                           th:classappend="${menuItem == 3} ? 'active' : ''">Tài khoản</a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           th:href="@{/}"
+                           th:classappend="${menuItem == 4} ? 'active' : ''">Hướng dẫn sử dụng</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content-->
+        <div class="col-10">
+            <!-- Header Bar -->
+            <div class="header-bar">
+                <h2 th:text="${menuHeader}"></h2>
+                <div class="user-info">
+                    <p>Hola! <span th:text="${username}"></span></p>
+                    <form id="logoutForm" class="logout-btn" th:action="@{/logout}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <a href="#" onclick="document.getElementById('logoutForm').submit()" style="text-decoration: none; color: #F58F12">Đăng xuất</a>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Metrics and Charts -->
+            <div class="report-section form-container">
+                <form th:method="get" th:action="@{/analyze}" th:object="${dto}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="platform" class="form-label">Chọn sàn</label>
+                                <select class="form-select" id="platform" aria-label="Platform"
+                                        th:field="*{platformId}">
+                                    <option selected th:value="${-99}" th:text="All"></option>
+                                    <option th:each="platform : ${platforms}"
+                                            th:value="${platform.getPlatformId()}"
+                                            th:text="${platform.getPlatformName().toUpperCase()}"></option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="time-period" class="form-label">Khoảng thời gian</label>
+                                <select class="form-select" id="time-period" aria-label="Time period"
+                                        th:field="*{timePeriod}" required>
+                                    <option th:each="period : ${periods}"
+                                            th:value="${period.getValue()}"
+                                            th:text="${period.getName()}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="product-category" class="form-label">Ngành hàng</label>
+                                <select class="form-select" id="product-category" aria-label="Product category"
+                                        th:field="*{categoryId}">
+                                    <option selected th:value="${-99}" th:text="All"></option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.getCategoryId()}"
+                                            th:text="${category.getCategoryName()}"></option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="keywords" class="form-label">Từ Khoá</label>
+                                <input type="text" class="form-control" id="keywords"
+                                       placeholder="Nhập vào tên sản phẩm hoặc tên ngành hàng (ngăn cách nhau bằng dấu ,)"
+                                       th:field="*{keywords}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-container">
+                        <button type="button" id="refresh-button"
+                                class="btn btn-secondary">Làm mới bộ lọc
+                        </button>
+                        <button type="submit" class="btn btn-primary">Phân tích</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- No data to show message -->
+            <div class="container nodata-message" th:if="${!showReport}">
+                <h3>Không có dữ liệu để hiển thị!</h3>
+            </div>
+
+            <!-- Report type switcher -->
+            <div class="switcher-container" th:if="${showReport}">
+                <a th:href="@{/analyze(page=${currentPage},
+                               platformId=${dto.getPlatformId()},
+                               timePeriod=${dto.getTimePeriod()},
+                               categoryId=${dto.getCategoryId()},
+                               keywords=${dto.getKeywords()},
+                               type='revenue',
+                               currentPageBatch=${currentPageBatch})}" style="text-decoration: none">
+                    <button type="button" class="btn btn-light" id="revenueBtn"
+                            th:classappend="${type == 'revenue'} ? 'active' : ''">Báo cáo theo Doanh thu
+                    </button>
+                </a>
+                <a th:href="@{/analyze(page=${currentPage},
+                               platformId=${dto.getPlatformId()},
+                               timePeriod=${dto.getTimePeriod()},
+                               categoryId=${dto.getCategoryId()},
+                               keywords=${dto.getKeywords()},
+                               type='sales',
+                               currentPageBatch=${currentPageBatch})}" style="text-decoration: none">
+                    <button type="button" class="btn btn-light" id="salesBtn"
+                            th:classappend="${type == 'sales'} ? 'active' : ''">Báo cáo theo Lượt bán
+                    </button>
+                </a>
+                <a th:href="@{/analyze(page=${currentPage},
+                               platformId=${dto.getPlatformId()},
+                               timePeriod=${dto.getTimePeriod()},
+                               categoryId=${dto.getCategoryId()},
+                               keywords=${dto.getKeywords()},
+                               type='revenue',
+                               currentPageBatch=${currentPageBatch})}" style="text-decoration: none">
+                    <button type="button" class="btn btn-light" id="exportBtn"
+                            th:class="active">Xuất báo cáo
+                    </button>
+                </a>
+            </div>
+
+            <!-- Summary Report Section -->
+            <div class="report-section" th:if="${showReport}">
+                <h2>Tổng quan thị trường</h2>
+                <p>Từ <span th:if="${fromDate != null}"
+                            th:text="${#dates.format(#temporals.format(fromDate), 'dd/MM/yyyy')}"></span> đến ngày
+                    <span th:if="${toDate != null}"
+                          th:text="${#dates.format(#temporals.format(toDate), 'dd/MM/yyyy')}"></span></p>
+                <div class="row text-center">
+                    <div class="col-md-3" th:if="${totalRevenue != null}">
+                        <h3 th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')}"></h3>
+                        <p>Tổng doanh thu (VND)</p>
+                    </div>
+                    <div class="col-md-3" th:if="${totalSold != null}">
+                        <h3 th:text="${#numbers.formatDecimal(totalSold, 0, 'COMMA', 0, 'POINT')}"></h3>
+                        <p>Lượt bán hàng thành công</p>
+                    </div>
+                    <div class="col-md-3" th:if="${totalProducts != null}">
+                        <h3 th:text="${#numbers.formatDecimal(totalProducts, 0, 'COMMA', 0, 'POINT')}"></h3>
+                        <p>Sản phẩm có phát sinh lượt bán</p>
+                    </div>
+                    <div class="col-md-3" th:if="${totalSellers > 1}">
+                        <h3 th:text="${#numbers.formatDecimal(totalSellers, 0, 'COMMA', 0, 'POINT')}"></h3>
+                        <p>Nhà bán hàng có thêm doanh thu</p>
+                    </div>
+                    <div class="col-md-3" th:if="${totalSellers <= 1}">
+                        <h4 style="color:gray;">Không có dữ liệu</h4>
+                        <p>Nhà bán hàng có thêm doanh thu</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="report-section" th:if="${showReport}">
+                <div class="chart-container" th:if="${showReport && reportManager.isShowAllPlatform()}">
+                    <h4>Thị phần các sàn TMĐT</h4>
+                    <canvas id="allPlatformChart"></canvas>
+                </div>
+                <div class="chart-container" th:if="${showReport && reportManager.isShowCategory()}">
+                    <h4>Top Ngành hàng</h4>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="chart-container" th:if="${showReport && reportManager.isShowSeller()}">
+                    <h4>Top Nhà bán hàng</h4>
+                    <canvas id="sellerChart"></canvas>
+                </div>
+                <div class="chart-container" th:if="${showReport && reportManager.isShowBrand()}">
+                    <h4>Top Thương hiệu</h4>
+                    <canvas id="topBrandsChart"></canvas>
+                </div>
+                <div class="chart-container" th:if="${showReport && reportManager.isShowLocation()}">
+                    <h4>Top Địa điểm</h4>
+                    <canvas id="locationChart"></canvas>
+                </div>
+                <div class="chart-container" th:if="${showReport && reportManager.isShowPriceRange()}">
+                    <h4>Phân bố giá bán</h4>
+                    <canvas id="priceRangeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Best Seller Section -->
+            <div class="report-section table-container" th:if="${showReport && reportManager.isShowProducts()}">
+                <div>
+                    <h4>Sản phẩm tăng trưởng tốt</h4>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Đánh giá</th>
+                            <th>Tổng số lượt bán</th>
+                            <th>Tổng số lượt bán trong giai đoạn</th>
+                            <th>Tổng doanh thu trong giai đoạn</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="product : ${productsData}">
+                            <td>
+                                <div class="product-cell">
+                                    <img th:src="${product.getProductImage()}"
+                                         alt="product-img">
+                                    <a th:href="${product.getProductUrl()}"
+                                       target="_blank">
+                                        <span th:text="${product.getProductName()}"></span>
+                                    </a>
+                                </div>
+                            </td>
+                            <td th:text="${#numbers.formatDecimal(product.getProductPrice(), 0, 'COMMA', 0, 'POINT') + 'đ'}"></td>
+                            <td th:text="${#numbers.formatDecimal(product.getProductReviewCount(), 0, 'COMMA', 0, 'POINT')}"></td>
+                            <td th:text="${#numbers.formatDecimal(product.getProductAllTimeSold(), 0, 'COMMA', 0, 'POINT')}"></td>
+                            <td th:text="${#numbers.formatDecimal(product.getTotalSold(), 0, 'COMMA', 0, 'POINT')}"></td>
+                            <td th:text="${#numbers.formatDecimal(product.getTotalAmount(), 0, 'COMMA', 0, 'POINT') + 'đ'}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <nav aria-label="Page navigation" th:if="${totalPage > 1}">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/analyze(page=1, platformId=${platformId}, timePeriod=${timePeriod}, categoryId=${categoryId}, keywords=${keywords}, type=${type}, currentPageBatch=1)}">First</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/analyze(page=${currentPage - 1}, platformId=${platformId}, timePeriod=${timePeriod}, categoryId=${categoryId}, keywords=${keywords}, type=${type}, currentPageBatch=${currentPageBatch})}">Previous</a>
+                        </li>
+
+                        <li class="page-item" th:if="${currentPageBatch > 1}">
+                            <a class="page-link"
+                               th:href="@{/analyze(page=${(currentPageBatch - 1) * pagesPerBatch}, platformId=${platformId}, timePeriod=${timePeriod}, categoryId=${categoryId}, keywords=${keywords}, type=${type}, currentPageBatch=${currentPageBatch - 1})}">...</a>
+                        </li>
+
+                        <li class="page-item"
+                            th:each="page : ${#numbers.sequence(startPage, endPage)}"
+                            th:classappend="${page == currentPage} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/analyze(page=${page}, platformId=${platformId}, timePeriod=${timePeriod}, categoryId=${categoryId}, keywords=${keywords}, type=${type}, currentPageBatch=${currentPageBatch})}"
+                               th:text="${page}">Page</a>
+                        </li>
+
+                        <li class="page-item" th:if="${currentPageBatch * pagesPerBatch < totalPage}">
+                            <a class="page-link"
+                               th:href="@{/analyze(page=${currentPageBatch * pagesPerBatch + 1}, platformId=${platformId}, timePeriod=${timePeriod}, categoryId=${categoryId}, keywords=${keywords}, type=${type}, currentPageBatch=${currentPageBatch + 1})}">...</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/analyze(page=${currentPage + 1}, platformId=${platformId}, timePeriod=${timePeriod}, categoryId=${categoryId}, keywords=${keywords}, type=${type}, currentPageBatch=${currentPageBatch})}">Next</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPage} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/analyze(page=${totalPage}, platformId=${platformId}, timePeriod=${timePeriod}, categoryId=${categoryId}, keywords=${keywords}, type=${type}, currentPageBatch=${(totalPage / pagesPerBatch) + 1})}">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-5 item">
+                            <a href="#"><img src="../static/images/logo.png" th:src="@{/images/logo.png}"
+                                             alt="logo"></a>
+                            <p><b>EcomAnalyzer</b> là dự án cá nhân với mục tiêu thu thập được dữ liệu chất lượng từ các
+                                sàn
+                                thương mại điện tử tại Việt Nam, từ đó đưa ra cho các nhà bán hàng những góc nhìn về
+                                chiến lược
+                                sản phẩm.</p>
+                        </div>
+                        <div class="col-md-4 item">
+                            <b>Thông tin liên hệ</b>
+                            <ul class="list-unstyled">
+                                <li>Representative: Nguyễn Đức Trường</li>
+                                <li>Address: Số 10 Tôn Thất Thuyết, Cầu Giấy, Hà Nội</li>
+                                <li>Email: ductruong.bkhn@gmail.com</li>
+                                <li>Phone: 0949331794</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3 item">
+                            <b>Kết nối với tôi</b>
+                            <ul class="list-unstyled">
+                                <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                                <li><a href="#"><i class="fab fa-github"></i> Github</a></li>
+                                <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // init data
+    const allPlatformData = /*[[${allPlatformData}]]*/ [];
+    const chartLabel = /*[[${chartLabel}]]*/ '';
+
+    // platform chart
+    if (allPlatformData && allPlatformData.length > 0) {
+        const platformLabels = allPlatformData.map(data => data.name);
+        const platformValues = allPlatformData.map(data => data.value);
+
+        // Calculate total value for percentage calculation
+        const totalValue = platformValues.reduce((sum, value) => sum + value, 0);
+
+        // Colors for each platform
+        const colors = {
+            'shopee': 'rgba(247, 68, 46, 0.8)',
+            'lazada': 'rgba(15, 20, 110, 0.8)',
+            'tiki': 'rgba(22, 112, 255, 0.8)'
+        };
+
+        const borderColors = {
+            'shopee': 'rgba(250,121,106,0.8)',
+            'lazada': 'rgba(46,50,122,0.8)',
+            'tiki': 'rgba(98,153,241,0.8)'
+        };
+
+        const platformChart = new Chart(document.getElementById('allPlatformChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: platformLabels.map((label, index) => {
+                    const percentage = ((platformValues[index] / totalValue) * 100).toFixed(2);
+                    return `${label} (${percentage}%)`;
+                }),
+                datasets: [{
+                    label: chartLabel,
+                    data: platformValues,
+                    backgroundColor: platformLabels.map(label => colors[label]),
+                    borderColor: platformLabels.map(label => borderColors[label]),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                const value = platformValues[tooltipItem.dataIndex];
+                                const formattedValue = value.toLocaleString();
+                                const percentage = ((value / totalValue) * 100).toFixed(2);
+                                return `${chartLabel}: ${formattedValue} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        console.log('No chart data available to render the chart.');
+    }
+
+    // Price Range Chart
+    const priceRangeData = /*[[${priceRangeData}]]*/ [];
+    if (priceRangeData && priceRangeData.length > 0) {
+        const priceRanges = priceRangeData.map(data => data.priceRange);
+        const totalSold = priceRangeData.map(data => data.totalSold);
+        const platformNames = [...new Set(priceRangeData.flatMap(data => Object.keys(data.platformAmounts)))].sort((a, b) => {
+            const totalA = priceRangeData.reduce((sum, data) => sum + (data.platformAmounts[a] || 0), 0);
+            const totalB = priceRangeData.reduce((sum, data) => sum + (data.platformAmounts[b] || 0), 0);
+            return totalB - totalA;
+        });
+
+        const platformColors = {
+            'shopee': 'rgba(247, 68, 46, 0.8)',
+            'lazada': 'rgba(15, 20, 110, 0.8)',
+            'tiki': 'rgba(22, 112, 255, 0.8)'
+        };
+
+        const datasets = platformNames.map(platform => {
+            return {
+                label: 'Doanh thu ' + platform,
+                data: priceRangeData.map(data => data.platformAmounts[platform] || 0),
+                backgroundColor: platformColors[platform],
+                borderColor: platformColors[platform],
+                borderWidth: 1,
+                stack: 'Stack 0'
+            };
+        });
+
+        datasets.push({
+            label: 'Lượt bán',
+            data: totalSold,
+            type: 'line',
+            borderColor: 'green',
+            borderWidth: 2,
+            yAxisID: 'right-y-axis',
+            fill: false
+        });
+
+        const priceRangeChart = new Chart(document.getElementById('priceRangeChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: priceRanges,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Doanh thu (VND)'
+                        }
+                    },
+                    'right-y-axis': {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Lượt bán'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        console.log('No chart data available to render the chart.');
+    }
+
+    // category chart
+    const categoriesData = /*[[${categoriesData}]]*/ [];
+    if (categoriesData && categoriesData.length > 0) {
+        const labels = categoriesData.map(data => data.name);
+        const dataValues = categoriesData.map(data => data.value);
+
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        const categoryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: chartLabel,
+                    data: dataValues,
+                    backgroundColor: 'rgba(255, 159, 64, 0.8)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } else {
+        console.log('No chart data available to render the chart.');
+    }
+
+
+    // Seller Chart
+    const sellersData = /*[[${sellersData}]]*/ [];
+    if (sellersData && sellersData.length > 0) {
+        const sellerLabels = sellersData.map(data => data.name);
+        const sellerValues = sellersData.map(data => data.value);
+
+        const sellerCtx = document.getElementById('sellerChart').getContext('2d');
+        const sellerChart = new Chart(sellerCtx, {
+            type: 'bar',
+            data: {
+                labels: sellerLabels,
+                datasets: [{
+                    label: chartLabel,
+                    data: sellerValues,
+                    backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } else {
+        console.log('No chart data available to render the chart.');
+    }
+
+    // Brand Chart
+    const brandsData = /*[[${brandsData}]]*/ [];
+    if (brandsData && brandsData.length > 0) {
+        const totalValue = brandsData.reduce((sum, data) => sum + data.value, 0);
+
+        const brandLabels = brandsData.map(data => {
+            const percentage = ((data.value / totalValue) * 100).toFixed(1); // Calculate percentage and format to 1 decimal place
+            return `${data.name}: ${percentage}%`; // Modify label to include percentage
+        });
+        const brandValues = brandsData.map(data => data.value);
+
+        const brandCtx = document.getElementById('topBrandsChart').getContext('2d');
+        const brandChart = new Chart(brandCtx, {
+            type: 'pie',
+            data: {
+                labels: brandLabels,
+                datasets: [{
+                    label: chartLabel,
+                    data: brandValues,
+                    backgroundColor: brandLabels.map(() => `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`),
+                    borderColor: brandLabels.map(() => `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`),
+                    borderWidth: 1
+                }]
+            }
+        });
+    } else {
+        console.log('No chart data available to render the chart.');
+    }
+
+    // Location Chart
+    const locationsData = /*[[${locationsData}]]*/ [];
+    if (locationsData && locationsData.length > 0) {
+        const totalValue = locationsData.reduce((sum, data) => sum + data.value, 0);
+
+        const locationLabels = locationsData.map(data => {
+            const percentage = ((data.value / totalValue) * 100).toFixed(1); // Calculate percentage and format to 1 decimal place
+            return `${data.name}: ${percentage}%`; // Modify label to include percentage
+        });
+        const locationValues = locationsData.map(data => data.value);
+
+        const locationCtx = document.getElementById('locationChart').getContext('2d');
+        const locationChart = new Chart(locationCtx, {
+            type: 'pie',
+            data: {
+                labels: locationLabels,
+                datasets: [{
+                    label: chartLabel,
+                    data: locationValues,
+                    backgroundColor: locationLabels.map(() => `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`),
+                    borderColor: locationLabels.map(() => `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`),
+                    borderWidth: 1
+                }]
+            }
+        });
+    } else {
+        console.log('No chart data available to render the chart.');
+    }
+
+    /*]]>*/
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const platformSelect = document.getElementById('platform');
+        const categorySelect = document.getElementById('product-category');
+
+        platformSelect.addEventListener('change', function () {
+            const platformId = platformSelect.value;
+
+            fetch(`/categories/${platformId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear current options
+                    categorySelect.innerHTML = '<option selected value="-99">All</option>';
+
+                    // Populate new options
+                    data.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.categoryId;
+                        option.textContent = category.categoryName;
+                        categorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading categories:', error));
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('refresh-button').addEventListener('click', function () {
+        document.getElementById('platform').selectedIndex = 0;
+        document.getElementById('time-period').selectedIndex = 0;
+        document.getElementById('product-category').selectedIndex = 0;
+        document.getElementById('keywords').value = '';
+    });
+</script>
+
+</body>
+
+</html>

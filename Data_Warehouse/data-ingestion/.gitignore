@@ -1,0 +1,20 @@
+### Lib ###
+.idea
+venv/
+
+### Projects ###
+projects/lazada/data/
+projects/lazada/logs/
+projects/lazada/proxy_auth_extension/
+projects/lazada/template/
+projects/lazada/chromedriver.exe
+projects/lazada/proxy_auth_extension.zip
+projects/lazada/lazada/settings.py
+
+projects/shopee/logs/
+projects/shopee/output/
+projects/shopee/chromedriver.exe
+
+projects/tiki/logs
+projects/tiki/chromedriver.exe
+projects/tiki/tiki/settings.py

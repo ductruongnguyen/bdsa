@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: web_server
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1039363942578-vf6d6vpm3ulq1f9ja52o8176vhf05u4d.apps.googleusercontent.com
+            client-secret: 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
+            scope: profile, email, openid
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            client-name: Google
+          facebook:
+            client-id: 494069629880696
+            client-secret: bc691f6e1d60fc9707a94314a1bdf5e6
+            scope: public_profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/facebook"
+            client-name: Facebook
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+          facebook:
+            authorization-uri: https://www.facebook.com/v7.0/dialog/oauth
+            token-uri: https://graph.facebook.com/v7.0/oauth/access_token
+            user-info-uri: https://graph.facebook.com/me?fields=id,name,email
+            user-name-attribute: id
+server:
+  port: 8080
+
+#logging:
+#  level:
+#    org.springframework.security: DEBUG

@@ -1,0 +1,5 @@
+### Lib ###
+.idea
+unit-test.ipynb
+venv/
+data/

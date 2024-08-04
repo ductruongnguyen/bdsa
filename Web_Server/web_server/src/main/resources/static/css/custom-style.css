@@ -1,0 +1,292 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/*Home Page*/
+.container-fluid, .row .col-2, .row .col-10 {
+    padding: 0;
+    margin: 0;
+}
+
+.row {
+    max-width: 100%;
+}
+
+/* Left Side-Bar Menu */
+.left-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 16%;
+    text-align: justify;
+    background-color: #f8f9fa;
+    padding: 30px;
+    font-size: 16px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.left-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.left-sidebar li {
+    margin-bottom: 35px;
+}
+
+.left-sidebar a {
+    text-decoration: none;
+    color: #333;
+}
+
+.left-sidebar li a img {
+    width: 100%;
+}
+
+.left-sidebar a:hover {
+    color: #F58F12;
+}
+
+.left-sidebar ul li a.active {
+    color: #F58F12;
+}
+
+/* Header Bar */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    background-color: #F58F12;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.header-bar .user-info {
+    display: flex;
+    align-items: center;
+}
+
+.header-bar p {
+    /* Adjust spacing as needed */
+    margin: 0 20px 0 0;
+}
+
+.header-bar h1 {
+    margin: 0;
+}
+
+.logout-btn {
+    background-color: white;
+    border: none;
+    color: #F58F12;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.form-container {
+    width: 90%;
+    margin: auto !important;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+.form-label {
+    font-weight: bold;
+}
+
+.container.nodata-message {
+    text-align: center;
+    margin: 40px;
+    height: 20%;
+    vertical-align: middle;
+}
+
+.container.nodata-message h3 {
+    color: #adadad;
+}
+
+.switcher-container {
+    margin: 50px 30px 20px 30px;
+}
+
+.switcher-container button {
+    margin-right: 10px;
+    padding: 10px;
+}
+
+.switcher-container button.active {
+    background-color: #F58F12;
+    color: white;
+}
+
+.switcher-container button:hover {
+    background-color: orange;
+    color: white;
+}
+
+.switcher-container button#exportBtn {
+    border: none;
+    border-radius: 2px;
+    margin-left: 55%
+}
+
+.report-section {
+    padding: 25px;
+    margin: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+.chart-container {
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.chart-container canvas {
+    width: 100%;
+    height: 400px;
+}
+
+.chart-container #allPlatformChart {
+    width: 55%;
+    height: 55%;
+    margin: auto;
+}
+
+.chart-container #topBrandsChart {
+    width: 55%;
+    height: 55%;
+    margin: auto;
+}
+
+.chart-container #locationChart {
+    width: 55%;
+    height: 55%;
+    margin: auto;
+}
+
+
+.table-container {
+    margin-top: 20px;
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+}
+
+.product-cell img {
+    margin-right: 10px;
+    max-width: 6%;
+    height: auto;
+}
+
+.product-cell a {
+    display: block;
+    text-align: left;
+    text-decoration: none;
+    color: black;
+}
+
+.product-cell a:hover {
+    color: orange;
+}
+
+.product-cell span {
+    display: block;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    padding: 30px;
+    margin-top: 125px;
+}
+
+.footer p {
+    margin: 10px 0;
+}
+
+.footer .container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.footer .row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer .row img {
+    max-width: 60%;
+    margin-bottom: 10px;
+}
+
+.footer .list-unstyled li {
+    margin: 5px 0;
+}
+
+.footer .list-unstyled a {
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.footer .list-unstyled a i {
+    margin-right: 10px;
+}
+
+.footer .list-unstyled a:hover {
+    color: #F58F12;
+}
+
+/*Best Selling Products*/
+.filter-form {
+    padding: 10px 40px;
+}
+
+/*Login Page*/
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 120px 20px 20px;
+    text-align: center;
+}
+
+.login-logo {
+    margin-bottom: 50px;
+}
+
+.login-logo h1 {
+    font-family: "Book Antiqua", serif;
+    margin-bottom: 50px;
+}
+
+.login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-google {
+    background-color: white;
+    color: black;
+    border: 1px solid #ddd;
+}
+
+.btn-facebook {
+    background-color: #3b5998;
+    color: white;
+}
+
+
