@@ -1,4 +1,5 @@
 ### Lib ###
+__pycache__
 .idea
 unit-test.ipynb
 venv/

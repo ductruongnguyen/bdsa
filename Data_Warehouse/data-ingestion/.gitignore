@@ -10,6 +10,7 @@ projects/lazada/template/
 projects/lazada/chromedriver.exe
 projects/lazada/proxy_auth_extension.zip
 projects/lazada/lazada/settings.py
+projects/lazada/lazada/__pycache__
 
 projects/shopee/logs/
 projects/shopee/output/
@@ -18,3 +19,4 @@ projects/shopee/chromedriver.exe
 projects/tiki/logs
 projects/tiki/chromedriver.exe
 projects/tiki/tiki/settings.py
+projects/tiki/tiki/__pycache__
