@@ -6,5 +6,5 @@ import truongnd.cp.web_server.entity.User;
 
 @Repository
 public interface UsersRepository extends JpaRepository<User, Long> {
-    User findByEmail(String email);
+    User findByEmailAndProvider(String email, String provider);
 }

@@ -41,7 +41,7 @@
                     </li>
                     <li>
                         <a href="#"
-                           th:href="@{/}"
+                           th:href="@{/user-profile}"
                            th:classappend="${menuItem == 3} ? 'active' : ''">Tài khoản</a>
                     </li>
                     <li>
@@ -121,7 +121,7 @@
             </div>
 
             <!-- No data to show message -->
-            <div class="container nodata-message" th:if="${!showReport}">
+            <div class="container nodata-message" th:if="${!showReport}" style="height: 300px">
                 <h3>Không có dữ liệu để hiển thị!</h3>
             </div>
 
@@ -149,17 +149,17 @@
                             th:classappend="${type == 'sales'} ? 'active' : ''">Báo cáo theo Lượt bán
                     </button>
                 </a>
-                <a th:href="@{/analyze(page=${currentPage},
-                               platformId=${dto.getPlatformId()},
-                               timePeriod=${dto.getTimePeriod()},
-                               categoryId=${dto.getCategoryId()},
-                               keywords=${dto.getKeywords()},
-                               type='revenue',
-                               currentPageBatch=${currentPageBatch})}" style="text-decoration: none">
-                    <button type="button" class="btn btn-light" id="exportBtn"
-                            th:class="active">Xuất báo cáo
-                    </button>
-                </a>
+<!--                <a th:href="@{/analyze(page=${currentPage},-->
+<!--                               platformId=${dto.getPlatformId()},-->
+<!--                               timePeriod=${dto.getTimePeriod()},-->
+<!--                               categoryId=${dto.getCategoryId()},-->
+<!--                               keywords=${dto.getKeywords()},-->
+<!--                               type='revenue',-->
+<!--                               currentPageBatch=${currentPageBatch})}" style="text-decoration: none">-->
+<!--                    <button type="button" class="btn btn-light" id="exportBtn"-->
+<!--                            th:class="active">Xuất báo cáo-->
+<!--                    </button>-->
+<!--                </a>-->
             </div>
 
             <!-- Summary Report Section -->

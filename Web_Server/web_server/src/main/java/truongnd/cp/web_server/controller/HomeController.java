@@ -2,6 +2,7 @@ package truongnd.cp.web_server.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -37,10 +38,11 @@ public class HomeController {
     @GetMapping("/")
     public String showHome(Model model,
                            @RequestParam(name = "menuItem", defaultValue = "1") Integer menuItem) {
-        String userName = "TruongND";
+
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<DimPlatform> platformList = platformRepository.findAll();
 
-        model.addAttribute("username", userName);
+        model.addAttribute("username", user.getName());
         model.addAttribute("menuHeader", MenuItems.getValueByCode(menuItem));
         model.addAttribute("menuItem", menuItem);
         model.addAttribute("platforms", platformList);
@@ -60,6 +62,7 @@ public class HomeController {
                           @RequestParam(value = "currentPageBatch", defaultValue = "1") int currentPageBatch,
                           @RequestParam(value = "pagesPerBatch", defaultValue = "15") int pagesPerBatch) {
 
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // Transform the dto for SQL query
         PeriodicSearchDTO transformedDTO = PeriodicSearchDTO.builder()
                 .platformId(dto.getPlatformId() == -99 ? null : dto.getPlatformId())
@@ -72,7 +75,6 @@ public class HomeController {
         Optional<List<FactPeriodicFilter>> factPeriodicFiltersOpt = factPeriodicSalesFilterService.getFactPeriodicFilters(transformedDTO);
 
         // Add init information to the UI
-        String userName = "TruongND";
         List<DimPlatform> platformList = platformRepository.findAll();
         List<DimCategory> categoryList = categoryRepository.findAll();
         List<DimCategory> categories = categoryList.stream()
@@ -82,7 +84,7 @@ public class HomeController {
                         category2.getCategoryId().compareTo(category1.getCategoryId()))
                 .toList();
 
-        model.addAttribute("username", userName);
+        model.addAttribute("username", user.getName());
         model.addAttribute("menuItem", menuItem);
         model.addAttribute("menuHeader", MenuItems.getValueByCode(menuItem));
         model.addAttribute("platforms", platformList);
@@ -194,7 +196,7 @@ public class HomeController {
                               @RequestParam(value = "pagesPerBatch", defaultValue = "15") int pagesPerBatch) {
 
         // init binding to the UI
-        String userName = "TruongND";
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<DimPlatform> platformList = platformRepository.findAll();
         List<DimCategory> categoryList = categoryRepository.findAll();
         List<DimCategory> categories = categoryList.stream()
@@ -203,7 +205,7 @@ public class HomeController {
                 .sorted((category1, category2) ->
                         category2.getCategoryId().compareTo(category1.getCategoryId()))
                 .toList();
-        model.addAttribute("username", userName);
+        model.addAttribute("username", user.getName());
         model.addAttribute("menuItem", menuItem);
         model.addAttribute("menuHeader", MenuItems.getValueByCode(menuItem));
         model.addAttribute("platforms", platformList);
@@ -254,6 +256,19 @@ public class HomeController {
         model.addAttribute("keywords", dto.getKeywords());
 
         return "best-selling";
+    }
+
+    @GetMapping("/user-profile")
+    public String bestSelling(Model model,
+                              @RequestParam(name = "menuItem", defaultValue = "3") Integer menuItem) {
+
+        CustomOAuth2User user = (CustomOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("username", user.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("menuItem", menuItem);
+        model.addAttribute("menuHeader", MenuItems.getValueByCode(menuItem));
+
+        return "user-profile";
     }
 
 }

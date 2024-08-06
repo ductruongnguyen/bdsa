@@ -40,7 +40,7 @@
                     </li>
                     <li>
                         <a href="#"
-                           th:href="@{/}"
+                           th:href="@{/user-profile}"
                            th:classappend="${menuItem == 3} ? 'active' : ''">Tài khoản</a>
                     </li>
                     <li>
@@ -109,7 +109,7 @@
             </form>
 
             <!-- No data to show message -->
-            <div class="container nodata-message" style="height: 300px"
+            <div class="container nodata-message" style="height: 350px"
                  th:if="${!showData}">
                 <h3>Không có dữ liệu để hiển thị!</h3>
             </div>
