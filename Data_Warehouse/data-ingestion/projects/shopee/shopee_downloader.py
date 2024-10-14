@@ -97,7 +97,7 @@ def downloader():
             file_opened_name = f.name
             urls_to_crawl = [url.strip() for url in f.readlines()]
 
-    batch_count = 37  # fix this before running
+    batch_count = 1  # fix this before running
     file_name = file_opened_name.split("\\")[1]
     name = str(file_name).split(".")[0]
     batch_id = f"{name}_{batch_count}"

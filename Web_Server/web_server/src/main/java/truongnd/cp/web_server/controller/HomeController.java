@@ -103,7 +103,7 @@ public class HomeController {
             return "home";
         }
 
-        this.addSummaryInformationToUI(model, dto, factPeriodicFilters, type);
+        this.addSummaryInformationToUI(model, dto, factPeriodicFilters);
         // Add price range chart
         List<PriceRangeChartDTO> priceRangeData = factPeriodicSalesFilterService.getPriceRangeChartData(factPeriodicFilters);
         model.addAttribute("chartLabel", Objects.equals(type, PeriodicType.REVENUE.getValue()) ? "Doanh thu (VND)" : "Lượt bán");
@@ -169,7 +169,7 @@ public class HomeController {
         return "home";
     }
 
-    private void addSummaryInformationToUI(Model model, PeriodicSearchDTO dto, List<FactPeriodicFilter> factPeriodicFilters, String type) {
+    private void addSummaryInformationToUI(Model model, PeriodicSearchDTO dto, List<FactPeriodicFilter> factPeriodicFilters) {
         // calculate metrics for Summary section
         PeriodicSummary periodicSummary = factPeriodicSalesFilterService.calculatePeriodicSummary(factPeriodicFilters);
 

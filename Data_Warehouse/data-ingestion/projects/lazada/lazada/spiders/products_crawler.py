@@ -41,7 +41,7 @@ class ProductsCrawlerSpider(scrapy.Spider):
 
     def start_requests(self):
         try:
-            with open(os.path.abspath('data/urls_to_crawl.txt'), 'r') as file:
+            with open(os.path.abspath('./data/urls_to_crawl.txt'), 'r') as file:
                 urls = file.readlines()
             if urls:
                 for url in urls:
@@ -51,7 +51,7 @@ class ProductsCrawlerSpider(scrapy.Spider):
 
     def is_captcha_present(self):
         try:
-            captcha_div = self.driver.find_element(By.XPATH, "//iframe[@title='reCAPTCHA']")
+            captcha_div = self.driver.find_element(By.XPATH, "//iframe[1]")
             return captcha_div is not None
         except:
             return False

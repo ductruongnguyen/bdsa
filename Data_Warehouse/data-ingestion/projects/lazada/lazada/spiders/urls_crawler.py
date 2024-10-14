@@ -11,6 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+import os
 
 from ..mailer import Mailer
 
@@ -63,7 +64,7 @@ class URLsCrawlerSpider(scrapy.Spider):
 
     def is_captcha_present(self):
         try:
-            captcha_div = self.driver.find_element(By.XPATH, "//iframe[@title='reCAPTCHA']")
+            captcha_div = self.driver.find_element(By.XPATH, "//iframe[1]")
             return captcha_div is not None
         except:
             return False
@@ -132,17 +133,17 @@ class URLsCrawlerSpider(scrapy.Spider):
                 else:
                     result.append(level_1)
 
-        # Get the current date and time
-        now = datetime.datetime.now()
-
-        # Create the filename with the current date and time
-        filename = now.strftime("./data/cats_to_crawl_%Y_%m_%d_%H.json")
-
-        # Write the list of dictionaries to the file in JSON format
-        with open(filename, 'w', encoding='utf-8') as file:
-            json.dump(result, file, ensure_ascii=False, indent=4)
-
-        self.logger.info(f"All categories to crawl recorded in logs folder: {filename}")
+        # # Get the current date and time
+        # now = datetime.datetime.now()
+        #
+        # # Create the filename with the current date and time
+        # filename = now.strftime("./data/cats_to_crawl_%Y_%m_%d_%H.json")
+        #
+        # # Write the list of dictionaries to the file in JSON format
+        # with open(filename, 'w', encoding='utf-8') as file:
+        #     json.dump(result, file, ensure_ascii=False, indent=4)
+        #
+        # self.logger.info(f"All categories to crawl recorded in logs folder: {filename}")
 
         return result
 
@@ -170,12 +171,15 @@ class URLsCrawlerSpider(scrapy.Spider):
         Mailer.send_error_email(self.name, f"An error occurred when processing {response.url}\n{str(failure)}")
 
     def closed(self, reason):
+        if not os.path.exists("./data"):
+            os.makedirs("./data")
+
         with open('./data/urls_to_crawl.txt', 'w') as file:
             for url in self.urls_to_crawl:
                 file.write(url + '\n')
 
-        with open('./logs/check_gen.json', 'w', encoding='utf-8') as file:
-            json.dump(self.check_gen_info, file, ensure_ascii=False, indent=4)
+        # with open('./logs/check_gen.json', 'w', encoding='utf-8') as file:
+        #     json.dump(self.check_gen_info, file, ensure_ascii=False, indent=4)
 
         if self.driver:
             self.driver.quit()

@@ -221,6 +221,7 @@ class WebScraper:
 if __name__ == "__main__":
     scraper = WebScraper(
         mhtml_directory=r'C:\Users\truon\Desktop\FUNiX\Download_Shopee',
-        output_directory='./output'
+        # output_directory='./output'
+        output_directory='./test'
     )
     scraper.run()
