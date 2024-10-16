@@ -1,6 +1,7 @@
 ### Lib ###
 .idea
 venv/
+airflow/logs
 
 ### Projects ###
 projects/lazada/data/
