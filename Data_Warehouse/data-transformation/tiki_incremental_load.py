@@ -31,9 +31,9 @@ class CategoryIncrementalETL(BaseETL):
             new_records_df = new_categories_level.alias('new').join(categories_db_level.alias('existing'),
                                                                     on=['category_code', 'platform_id'],
                                                                     how='left_anti')
-            if new_records_df.count() > 0:
-                new_records_df = new_records_df.select("new.*")
-                diff_categories_df.union(new_records_df)
+                if new_records_df.count() > 0:
+                    new_records_df = new_records_df.select("new.*")
+                    diff_categories_df = diff_categories_df.union(new_records_df)
 
         return diff_categories_df
 
