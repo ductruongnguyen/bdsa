@@ -44,12 +44,12 @@ def read_data_from_postgres(spark: SparkSession, table_name: str) -> DataFrame:
         "password": DB_CREDENTIALS['password'],
         "driver": DB_CREDENTIALS['driver']
     }
-    end_time = time.time()
     result = spark.read.jdbc(
         url=jdbc_url,
         table=f"{DB_CREDENTIALS['schema']}.{table_name}",
         properties=connection_properties
     )
+    end_time = time.time()
     logger.info(f"Read data from {table_name.capitalize()} success in {end_time - start_time} seconds")
     return result
 
